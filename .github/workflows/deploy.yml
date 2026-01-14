@@ -34,8 +34,9 @@ jobs:
 
             echo "♻️ Restart PM2"
             pm2 delete boronosoft-react || true
-            pm2 serve build 3000 --name boronosoft-react
+            pm2 serve dist 3000 --name boronosoft-react
 
             pm2 save
             echo "✅ Deploy completed"
+
           EOF

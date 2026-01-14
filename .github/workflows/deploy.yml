@@ -34,9 +34,10 @@ jobs:
             echo "🏗️ Build React app (Vite)"
             npm run build
 
-            echo "♻️ Restart PM2 (serve dist)"
-            pm2 delete boronosoft-react || true
-            pm2 serve dist 3000 --name boronosoft-react
+           pm2 describe boronosoft-react > /dev/null \
+              && pm2 restart boronosoft-react \
+              || pm2 serve dist 3000 --name boronosoft-react
+
 
             pm2 save
 

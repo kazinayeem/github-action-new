@@ -1,4 +1,4 @@
-name: Deploy to EC2
+name: Deploy React App to EC2
 
 on:
   push:
@@ -16,7 +16,26 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-      # success test login step
-      - name: Test SSH Connection
+      - name: Deploy React App
         run: |
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "echo 'SSH connection successful'"
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            set -e
+
+            cd /home/ubuntu/new-boronosft
+
+            echo "📥 Pull latest code"
+            git pull origin main
+
+            echo "📦 Install dependencies"
+            npm install
+
+            echo "🏗️ Build React app"
+            npm run build
+
+            echo "♻️ Restart PM2"
+            pm2 delete boronosoft-react || true
+            pm2 serve build 3000 --name boronosoft-react
+
+            pm2 save
+            echo "✅ Deploy completed"
+          EOF
